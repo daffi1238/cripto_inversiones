@@ -28,7 +28,7 @@ def main():
     print (date0)
 
     #date0 = datetime(2021, 1, 1)
-    
+
     #Obtenemos el historico de precios, uno por día
     for i in coins:
         #Creamos los directrios para cada moneda y los ficheros respectivos

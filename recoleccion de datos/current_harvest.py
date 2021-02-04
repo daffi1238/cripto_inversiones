@@ -1,13 +1,32 @@
 #Script para obtener la media del valor del bitcoin a cada minuto
-#script para obtener el valor del bitcoin a cada segundo
+#script para obtener el valor del bitcoin a cada segundo y sacar el valor medio,
+#valor maximo y minimo en dicho minuto
+#Está diseñado para tan sólo pillar los valores de los próximos 10 minutos.
+
 import cryptocompare
 from datetime import datetime
 import csv
 import time
 import numpy as np
 
+try:
+    f = open("outFile.csv")
+    existe=True
+    # Do something with the file
+except IOError:
+    print("El fichero no existe, vamos a generarlo de 0")
+    existe=False
+
+
+
 file = open("outFile.csv", "a")
+
 csvWriter = csv.writer( file )
+if existe==False:
+    print("El fichero no existe asi que le añadimos una fila")
+    csvWriter.writerow( ["Fecha", "valor de media minuto", "precio max", "preciomin"] )
+else:
+    pass
 
 cryptocompare.get_price('BTC')
 
@@ -40,7 +59,7 @@ for x in range(10):#10 minutos
             print("El valor de minuto dentro del else: " + str(now.minute))
             print("El valor de i "+str(i) + "El valor del sumatorio: "+str(sum(valor_btc)))
             media_minuto=np.sum(valor_btc)/i
-            fecha=str(now.year) +'/'+str(now.month)+'/'+str(now.day)+'/'+str(now.minute)
+            fecha=str(now.year) +'/'+str(now.month)+'/'+str(now.day)+'/'+str(now.hour) +'/'+str(now.minute)
             csvWriter.writerow( [fecha, media_minuto, precio_max, precio_min] )
 
             print("El valor de la media en el minuto " + str(now.minute) +" es " + str(media_minuto))

@@ -17,6 +17,7 @@ threads=10
 def main():
     #Una lista de todas todas las monedas
     coins=cryptocompare.get_coin_list(format=True)
+    #Añadiendo algo de código podría añadir varias monedas a coins
     coins=['ETH']
 
     #Definimos una fecha inicial y calculamos la distancia de días con la actual

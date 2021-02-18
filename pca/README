@@ -1,0 +1,4 @@
+PCA, Principal Component Analysis, una herramienta que nos relaciona la variabilidad
+de cada variable con la de todas las demas y nos quedamos con las k variables
+con mayor correlación con las demás siendo el resultado el tanto porciento
+que dicha componente contiene del conjunto. Lo explico en el código según lo voy haciendo.

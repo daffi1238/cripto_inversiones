@@ -22,7 +22,7 @@ file = open("outFile.csv", "a")
 csvWriter = csv.writer( file )
 if existe==False:
     print("El fichero no existe asi que le añadimos una fila")
-    csvWriter.writerow( ["Fecha", "valor de media minuto", "precio max", "preciomin"] )
+    csvWriter.writerow( ["timestamp", "BTC", "ETH", "BNB", "DODGE", "DOT"] )
 else:
     pass
 

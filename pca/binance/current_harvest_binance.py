@@ -11,6 +11,12 @@ from datetime import datetime
 import csv
 import time
 import numpy as np
+import pandas as pd
+
+import threading
+threads=10      #sin definir diria yo
+
+import matplotlib.pyplot as plt
 
 #api_key="AAAAAAAAAAAAAAAAAA"
 #api_secret="BBBBBBBBBBBBBBBB"
@@ -27,6 +33,29 @@ def signal_handler_function(signum, frame):
     print("El menor valor de ETH fue: ", min_eth)
     print("El mayor valor de ETH fue: ", max_eth)
 
+    #Grafica precio btc
+    # plotting the points
+    plt.plot(timestamp, btc_values)
+    # naming the x axis
+    plt.xlabel('Tiempo')
+    # naming the y axis
+    plt.ylabel('Precio - Bitcoin')
+    # giving a title to my graph
+    plt.title('My first graph!')
+    # function to show the plot
+    plt.show()
+
+    #Grafica ewma
+    # plotting the points
+    plt.plot(timestamp, emwa)
+    # naming the x axis
+    plt.xlabel('Tiempo')
+    # naming the y axis
+    plt.ylabel('EWMA')
+    # giving a title to my graph
+    plt.title('My second graph!')
+    # function to show the plot
+    plt.show()
 
 
     sys.exit(0)
@@ -64,22 +93,29 @@ client.get_all_orders(symbol='BNBBTC', requests_params={'proxies': proxies})
 try:
     f = open("outFile.csv")
     existe=True
+    print("Elimina el fichero para el correcto funcionamiento del programa")
+    #sys.exit(0)
+
     # Do something with the file############################################
 except IOError:
     print("El fichero no existe, vamos a generarlo de 0")
     existe=False
 
 
-file = open("outFile.csv", "a")
+file = open("outFile.csv", "w")   #file = open("outFile.csv", "a")
 
 csvWriter = csv.writer( file )
 if existe==False:
     print("El fichero no existe asi que le añadimos una fila")
-    csvWriter.writerow( ["timestamp", "BTC", "ETH"] )  #    csvWriter.writerow( ["timestamp", "BTC", "ETH", "BNB", "DODGE", "DOT"] )
+    csvWriter.writerow( ["timestamp", "BTC", "ETH", "DODGE", ] )  #    csvWriter.writerow( ["timestamp", "BTC", "ETH", "BNB", "DODGE", "DOT"] )
 else:
     pass
+
+
+
+
 #############################################################################
-#Contadores
+#Contadores    min-Max
 min_btc=float(client.get_symbol_ticker(symbol="BTCUSDT").get('price'))
 max_btc=float(client.get_symbol_ticker(symbol="BTCUSDT").get('price'))
 min_eth=float(client.get_symbol_ticker(symbol="ETHUSDT").get('price'))
@@ -107,8 +143,35 @@ def check_minmax(current, coin):
         else:
             pass
 
-#####Bucle principal#####
+####Calculo de la EWMA##########################################################
+def __EWMA__():
+    global btc_values
+    global eth_values
+
+    window_size = contador+1
+    numbers_series = pd.Series(btc_values)
+#    numbers_series_eth = pd.Series(numbers)
+
+    windows = numbers_series.rolling(window_size)
+    moving_averages = windows.mean()
+
+    moving_averages_list = moving_averages.tolist()
+    without_nans = moving_averages_list[window_size - 1:]
+
+    global ewma
+    ewma.append(without_nans)
+
+    print(without_nans)
+################################################################################
+
+#####Bucle principal############################################################
 fin=0
+contador=0
+btc_values = []
+eth_values = []
+moving_averages = []
+timestamp=[]
+ewma=[]###Esto no furulaaa
 while True:
     btc_price = float(client.get_symbol_ticker(symbol="BTCUSDT").get('price'))
     print("BTC: ", btc_price)
@@ -118,9 +181,25 @@ while True:
 
     now = datetime.now()
     csvWriter.writerow( [now, btc_price, eth_price] )
+    btc_values.append(btc_price)
+    eth_values.append(eth_price)
+    timestamp.append(now)
+    #test_list.pop(0)   to remove the first element
+
 
     check_minmax(btc_price, "BTC")
 
     check_minmax(eth_price, "ETH")
 
+    if contador>0:
+        t=threading.Thread(target=__EWMA__())
+        t.start()
+        t.join()
+        #btc_values.pop(0)
+        #eth_values.pop(0)
+
+    contador=contador+1
     time.sleep(1)
+
+     #Para esperar a que el hilo termine sus calculos en caso de que no fuera asi
+##################################################################################

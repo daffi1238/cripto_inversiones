@@ -11,8 +11,18 @@ import numpy as np
 import os
 import errno
 
+import signal
+
 import threading
 threads=10
+
+#Ctrl-C####################################
+def def_handler(sig, frame):
+    print ("\n [!] Saliendo...")
+     sys.exit(1)
+
+signal.signal(signal.SIGINT, def_handler)
+###########################################
 
 def main():
     #Una lista de todas todas las monedas
